@@ -22,22 +22,22 @@ const SYMBOL_COUNT = {
     B: 6,
     C: 4,
     D: 2
-}
+};
 
 const SYMBOL_VALUES = {
     A: 2,
     B: 3,
     C: 4,
     D: 5
-}
+};
 
 const deposit = () => {
-    while (true){
+    while (true) {
         const depositAmount = prompt("Enter Amount: ");
         // to convert input into numbers
         const numDepositAmout = parseFloat(depositAmount);  
 
-        if (isNaN(numDepositAmout)|| numDepositAmout <= 0){
+        if (isNaN(numDepositAmout) || numDepositAmout <= 0){
             console.log("Invalid Entry! Try again.");
         } else{
             return numDepositAmout;
@@ -47,7 +47,7 @@ const deposit = () => {
 
 //how many lines players wanna bet on
 const getSlots = () => {
-    while (true){
+    while (true) {
         const slots = prompt("Enter Betting Slots(1-3): ");
         // to convert input into numbers
         const numSlots = parseFloat(slots);  
@@ -62,23 +62,22 @@ const getSlots = () => {
 };
 
 //allows us to see total bet
-const getBet = (balance, betPerLine) =>{
+const getBet = (balance, lines) =>{
     while (true){
-        const betPerLine = prompt("Enter Bet Amount per line: ");
+        const bet = prompt("Enter Bet Amount per line: ");
         // to convert input into numbers
-        const numBet = parseFloat(betPerLine);  
+        const numbet = parseFloat(bet);  
 
-        if (isNaN(numBet)|| numBet <= 0 || numBet > balance/betPerLine){
+        if (isNaN(numbet)|| numbet <= 0 || numbet > balance/lines){
             console.log("Invalid Entry! Try again.");
         } else{
-            return numBet;
+            return numbet;
         }
     }
 };
 
-const spinMaachine = () => {
+const spinMachine = () => {
     const symbols = [];
-
     // looping through and counting all the symbols in SYMBOL_COUNT
     for (const [symbol, count]  of Object.entries(SYMBOL_COUNT)){
         for (let i = 0; i < count; i++){
@@ -89,7 +88,7 @@ const spinMaachine = () => {
     // making the slots/columns of the Slot Machine
     // Then picking the symbol
     const reels = [];
-    for (let i = 0; i < COLUMNS; i++){
+    for (let i = 0; i < COLUMNS; i++) {
         // reels.push([]): makes slots into the arr depending on 
         // no of columns ie slots
         // making a copy of symbols arr because when we roll
@@ -99,7 +98,7 @@ const spinMaachine = () => {
         reels.push([]);
         const reelSymbols = [...symbols];
         for (let j = 0; j < ROWS; j++){
-            const randInt = Math.floor(Math.random()*reelSymbols.length);
+            const randInt = Math.floor(Math.random() * reelSymbols.length);
             const selSymbol = reelSymbols[randInt];
             // appending to reels
             reels[i].push(selSymbol);
@@ -109,9 +108,71 @@ const spinMaachine = () => {
     return reels;
 };
 
- 
+// transposing reels to get the winning combination
+// output rn : [[A B D], [C D D], [C A B]] } these are the columns of the slot machine written horizontally
+// o/t we want: 
+// A C C    } so, for this output
+// B D A    } we need to transpose the 2D matrices
+// D D B    } lookup: "Transposing a 2D Matrix"
+const transpose = (reels) => {
+    const rows = [];
+
+    for (let i = 0; i < ROWS; i++){
+        rows.push([]);
+        for (let j = 0; j < COLUMNS; j++){
+            // first, we access the columns and then we take the elenemt of row from it
+            rows[i].push(reels[j][i]);
+        }
+    }
+    return rows;
+};
+
+// printing like : A | B | C
+const printMachine = (rows) => {
+    for (const row of rows) {
+
+        let rowVal = "";
+        for (const [i, symbol] of row.entries()) {
+            rowVal += symbol;
+            if (i != row.length - 1){
+                rowVal += " | ";
+            }
+        }
+        console.log(rowVal);
+    }
+};
+
+const getWinnings = (rows, bet, lines) =>{
+    let winnings = 0;
+
+    for (let row = 0; row < lines; row++){
+        const symbols = rows[row];
+        // checking if all symbols are the same
+        let allSame = true;
+
+        for (const symbol of symbols){
+            if (symbol != symbols[0]){
+                allSame = false;
+                break;
+            }
+        }
+
+        if (allSame){
+            // when we get a win: sym_vals[syms[0]]
+            // gives how many pts are earned then we multiply it to
+            // betted money per line to for winnings 
+            pointsEarned = SYMBOL_VALUES[symbols[0]];
+            winnings += bet * pointsEarned;
+        }
+    }
+    return winnings;
+};
 
 let balance = deposit();
-const slots = getBettingSlots();
-const bet = getBet(balance, betPerLine);
+const numSlots = getSlots();
+const bet = getBet(balance, numSlots);
 const reels = spinMachine();
+const rows = transpose(reels);
+printMachine(rows);
+const winnings = getWinnings(rows, bet, numSlots);
+console.log("YOU WON $" + winnings.toString());
