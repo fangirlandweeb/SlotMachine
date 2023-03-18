@@ -168,11 +168,37 @@ const getWinnings = (rows, bet, lines) =>{
     return winnings;
 };
 
-let balance = deposit();
-const numSlots = getSlots();
-const bet = getBet(balance, numSlots);
-const reels = spinMachine();
-const rows = transpose(reels);
-printMachine(rows);
-const winnings = getWinnings(rows, bet, numSlots);
-console.log("YOU WON $" + winnings.toString());
+const game = () =>{
+    let balance = deposit();
+    
+    // loops till balance lasts
+    while (true){
+        console.log("BALANCE: $" + balance);
+        const numSlots = getSlots();
+        const bet = getBet(balance, numSlots);
+
+        // deducting balance after betting
+        balance -= bet * numSlots;
+        const reels = spinMachine();
+        const rows = transpose(reels);
+        printMachine(rows);
+        const winnings = getWinnings(rows, bet, numSlots);
+
+        // adding total winnigns
+        balance += winnings;
+
+        // well i made a mistake here it congratulates you for not winning as well
+        // consider it a participation trophy since i probably won't be changing it 
+        console.log("\n\n\t☆*: .｡. o(≧▽≦)o .｡.:*☆CONGRATULATIONS!!!! ☆*: .｡. o(≧▽≦)o .｡.:*☆ \n\t\t\tYOU WON $" + winnings.toString() + "\n\t\tヾ(≧▽≦*)o IT'S PARTY TIME!!! W00HOO");
+
+        if (balance <= 0) {
+            console.log("≧ ﹏ ≦ /n you're broke ＞﹏＜");
+            break;
+        }
+        const playAgain = prompt("\nDo you want to play again (y/n)? ");
+
+        if (playAgain != "y") break;
+    }
+};
+
+game();
