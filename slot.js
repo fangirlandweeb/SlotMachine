@@ -4,7 +4,7 @@
 // 2. Determine where and how much to bet
 // 3. Collect bet
 // 4. Spin slots
-// 5. If user won: give prize money
+// 5. If user won: give prize money else: boohoo
 // 6. play again?
 
 // requiring prompt ie user input-----
@@ -62,7 +62,7 @@ const getSlots = () => {
 };
 
 //allows us to see total bet
-const getBet = (balance) =>{
+const getBet = (balance, betPerLine) =>{
     while (true){
         const betPerLine = prompt("Enter Bet Amount per line: ");
         // to convert input into numbers
@@ -76,7 +76,7 @@ const getBet = (balance) =>{
     }
 };
 
-const spin = () => {
+const spinMaachine = () => {
     const symbols = [];
 
     // looping through and counting all the symbols in SYMBOL_COUNT
@@ -87,10 +87,31 @@ const spin = () => {
     }
 
     // making the slots/columns of the Slot Machine
-    const reels = [[],[],[]];
-    for (let i = 0;)
+    // Then picking the symbol
+    const reels = [];
+    for (let i = 0; i < COLUMNS; i++){
+        // reels.push([]): makes slots into the arr depending on 
+        // no of columns ie slots
+        // making a copy of symbols arr because when we roll
+        // out a symbol we need to take it out/ pop it off
+        // to ensure it doesn't get repeated. 
+        // permutation combination brain mode engaged
+        reels.push([]);
+        const reelSymbols = [...symbols];
+        for (let j = 0; j < ROWS; j++){
+            const randInt = Math.floor(Math.random()*reelSymbols.length);
+            const selSymbol = reelSymbols[randInt];
+            // appending to reels
+            reels[i].push(selSymbol);
+            reelSymbols.splice(randInt, 1);
+        }
+    }
+    return reels;
 };
+
+ 
 
 let balance = deposit();
 const slots = getBettingSlots();
-const bet = getBet(balance);
+const bet = getBet(balance, betPerLine);
+const reels = spinMachine();
